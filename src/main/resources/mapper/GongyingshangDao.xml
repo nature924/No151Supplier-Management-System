@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.GongyingshangDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.gongyingshang_uuid_number as gongyingshangUuidNumber
+        ,a.gongyingshang_name as gongyingshangName
+        ,a.lianxiren_name as lianxirenName
+        ,a.lianxiren_phone as lianxirenPhone
+        ,a.lianxiren_address as lianxirenAddress
+        ,a.gongyingshang_types as gongyingshangTypes
+        ,a.gongyingshang_xinyongdengji_types as gongyingshangXinyongdengjiTypes
+        ,a.gongyingshang_content as gongyingshangContent
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.GongyingshangView" >
+        SELECT
+        <include refid="Base_Column_List" />
+        <!-- 级联表的字段 -->
+
+        FROM gongyingshang  a
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test=" params.gongyingshangUuidNumber != '' and params.gongyingshangUuidNumber != null and params.gongyingshangUuidNumber != 'null' ">
+                and a.gongyingshang_uuid_number like CONCAT('%',#{params.gongyingshangUuidNumber},'%')
+            </if>
+            <if test=" params.gongyingshangName != '' and params.gongyingshangName != null and params.gongyingshangName != 'null' ">
+                and a.gongyingshang_name like CONCAT('%',#{params.gongyingshangName},'%')
+            </if>
+            <if test=" params.lianxirenName != '' and params.lianxirenName != null and params.lianxirenName != 'null' ">
+                and a.lianxiren_name like CONCAT('%',#{params.lianxirenName},'%')
+            </if>
+            <if test=" params.lianxirenPhone != '' and params.lianxirenPhone != null and params.lianxirenPhone != 'null' ">
+                and a.lianxiren_phone like CONCAT('%',#{params.lianxirenPhone},'%')
+            </if>
+            <if test=" params.lianxirenAddress != '' and params.lianxirenAddress != null and params.lianxirenAddress != 'null' ">
+                and a.lianxiren_address like CONCAT('%',#{params.lianxirenAddress},'%')
+            </if>
+            <if test="params.gongyingshangTypes != null and params.gongyingshangTypes != ''">
+                and a.gongyingshang_types = #{params.gongyingshangTypes}
+            </if>
+            <if test="params.gongyingshangXinyongdengjiTypes != null and params.gongyingshangXinyongdengjiTypes != ''">
+                and a.gongyingshang_xinyongdengji_types = #{params.gongyingshangXinyongdengjiTypes}
+            </if>
+            <if test=" params.gongyingshangContent != '' and params.gongyingshangContent != null and params.gongyingshangContent != 'null' ">
+                and a.gongyingshang_content like CONCAT('%',#{params.gongyingshangContent},'%')
+            </if>
+
+        </where>
+        order by a.${params.sort} ${params.order}
+    </select>
+
+</mapper>

@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.ShangpinChuruInoutDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.yuangong_id as yuangongId
+        ,a.shangpin_churu_inout_uuid_number as shangpinChuruInoutUuidNumber
+        ,a.shangpin_churu_inout_name as shangpinChuruInoutName
+        ,a.shangpin_churu_inout_types as shangpinChuruInoutTypes
+        ,a.shangpin_churu_inout_content as shangpinChuruInoutContent
+        ,a.insert_time as insertTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.ShangpinChuruInoutView" >
+        SELECT
+        <include refid="Base_Column_List" />
+        <!-- 级联表的字段 -->
+        ,yuangong.yuangong_name as yuangongName
+        ,yuangong.yuangong_phone as yuangongPhone
+        ,yuangong.yuangong_id_number as yuangongIdNumber
+        ,yuangong.yuangong_photo as yuangongPhoto
+        ,yuangong.yuangong_email as yuangongEmail
+        ,yuangong.jinyong_types as jinyongTypes
+
+        FROM shangpin_churu_inout  a
+        left JOIN yuangong yuangong ON a.yuangong_id = yuangong.id
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test="params.yuangongId != null and params.yuangongId != ''">
+                and (
+                    a.yuangong_id = #{params.yuangongId}
+                )
+            </if>
+            <if test=" params.shangpinChuruInoutUuidNumber != '' and params.shangpinChuruInoutUuidNumber != null and params.shangpinChuruInoutUuidNumber != 'null' ">
+                and a.shangpin_churu_inout_uuid_number like CONCAT('%',#{params.shangpinChuruInoutUuidNumber},'%')
+            </if>
+            <if test=" params.shangpinChuruInoutName != '' and params.shangpinChuruInoutName != null and params.shangpinChuruInoutName != 'null' ">
+                and a.shangpin_churu_inout_name like CONCAT('%',#{params.shangpinChuruInoutName},'%')
+            </if>
+            <if test="params.shangpinChuruInoutTypes != null and params.shangpinChuruInoutTypes != ''">
+                and a.shangpin_churu_inout_types = #{params.shangpinChuruInoutTypes}
+            </if>
+            <if test=" params.shangpinChuruInoutContent != '' and params.shangpinChuruInoutContent != null and params.shangpinChuruInoutContent != 'null' ">
+                and a.shangpin_churu_inout_content like CONCAT('%',#{params.shangpinChuruInoutContent},'%')
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+            <if test="params.insertTime != null and params.insertTime != ''">
+                and a.insert_time = #{params.insertTime}
+            </if>
+
+                <!-- 判断员工的id不为空 -->
+            <if test=" params.yuangongIdNotNull != '' and params.yuangongIdNotNull != null and params.yuangongIdNotNull != 'null' ">
+                and a.yuangong_id IS NOT NULL
+            </if>
+            <if test=" params.yuangongName != '' and params.yuangongName != null and params.yuangongName != 'null' ">
+                and yuangong.yuangong_name like CONCAT('%',#{params.yuangongName},'%')
+            </if>
+            <if test=" params.yuangongPhone != '' and params.yuangongPhone != null and params.yuangongPhone != 'null' ">
+                and yuangong.yuangong_phone like CONCAT('%',#{params.yuangongPhone},'%')
+            </if>
+            <if test=" params.yuangongIdNumber != '' and params.yuangongIdNumber != null and params.yuangongIdNumber != 'null' ">
+                and yuangong.yuangong_id_number like CONCAT('%',#{params.yuangongIdNumber},'%')
+            </if>
+            <if test=" params.yuangongEmail != '' and params.yuangongEmail != null and params.yuangongEmail != 'null' ">
+                and yuangong.yuangong_email like CONCAT('%',#{params.yuangongEmail},'%')
+            </if>
+            <if test="params.jinyongTypes != null  and params.jinyongTypes != ''">
+                and yuangong.jinyong_types = #{params.jinyongTypes}
+            </if>
+
+        </where>
+        order by a.${params.sort} ${params.order}
+    </select>
+
+</mapper>
